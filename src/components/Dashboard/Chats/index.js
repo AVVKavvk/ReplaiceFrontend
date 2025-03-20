@@ -20,7 +20,7 @@ function Chats() {
           {
           isAccountViewing && selectedUser
            &&
-          <div className="flex  -mt-[355px] h-full w-[350px]">
+          <div className="flex  -mt-[345px] h-full w-[350px]">
           <AccountInfo/>
           </div>
           }

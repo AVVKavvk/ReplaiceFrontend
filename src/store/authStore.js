@@ -1,7 +1,9 @@
 import {create} from 'zustand';
 import { axiosClient } from '../utils/axiosClient';
 import toast from 'react-hot-toast';
-export const useAuthStore = create((set) => ({
+import {io} from 'socket.io-client';
+
+export const useAuthStore = create((set,get) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
@@ -9,13 +11,21 @@ export const useAuthStore = create((set) => ({
   isCheckingAuth: true,
   accountInfo: null,
   onlineUsers:[],
+  socket:null,
 
   checkAuth : async ()=>{
     try {
       const res = await axiosClient.get("/api/auth/check")
       // console.log(res.data.result.user);
       if(res.data.status!=="error")
+      {
         set({authUser:res.data.result.user})
+        get().connectSocket();
+      }
+      else
+      {
+        set({authUser:null})
+      }
       
     } catch (err) {
       console.error(err)
@@ -34,6 +44,7 @@ export const useAuthStore = create((set) => ({
         console.log(res.data);
         if(res.data.status !=="error"){
           set({authUser:res.data.result})
+          get().connectSocket();
           toast.success("Account created successfully")
         }
         else {
@@ -54,9 +65,10 @@ export const useAuthStore = create((set) => ({
     try {
       set({isLoggingIn:true})
       const res = await axiosClient.post("/api/auth/login",data)
-      console.log(res.data);
+      // console.log(res.data);
       if(res.data.status !=="error"){
         set({authUser:res.data.result})
+        get().connectSocket();
         toast.success("Logged in successfully")
       }
       else {
@@ -77,6 +89,7 @@ export const useAuthStore = create((set) => ({
     try {
       await axiosClient.post("/api/auth/logout")
       set({authUser:null})
+      get().disconnectSocket();
       toast.success("Logged out successfully")
     } catch (err) {
       toast.error(err.message)
@@ -115,6 +128,39 @@ export const useAuthStore = create((set) => ({
       }
     } catch (err) {
       toast.error(err.message)
+    }
+  },
+
+  connectSocket : async()=>{
+    try {
+      const {authUser, socket} = get();
+
+      if(!authUser || socket?.connected) return null;
+      const socketInstance = io(process.env.REACT_APP_BASE_URL,{
+        query:{
+          userId:authUser._id
+        }
+      })
+
+      socketInstance.connect();
+      set({socket:socketInstance})
+
+      socketInstance.on("getOnlineUsers",(userIds)=>{
+        set({onlineUsers:userIds})
+      })
+      
+    } catch (err) {
+      console.log(err.message);
+      toast.error(err.message)
+    }
+  },
+  disconnectSocket: async()=>{
+    try {
+      if(get().socket?.connected) get().socket?.disconnect();
+
+    } catch (err) {
+      toast.error(err.message)
+
     }
   }
 

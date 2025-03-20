@@ -47,7 +47,7 @@ const AccountInfo = () => {
       </div>
       <div className="w-80 p-4 flex flex-col items-center justify-center rounded-lg shadow-lg relative">
       <button 
-        className="absolute top-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white size-14 flex items-center justify-center rounded-full p-2 shadow-md hover:bg-gray-700 transition"
+        className="absolute top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white size-14 flex items-center justify-center rounded-full p-2 shadow-md hover:bg-gray-700 transition"
         onClick={handleAccountViewing}
       >
         <X />

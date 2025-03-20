@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
-import { LogOut, MessageSquare, Settings, User } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Settings, } from "lucide-react";
 
 const Navbar = () => {
-  const { logout, authUser } = useAuthStore();
+  const {authUser } = useAuthStore();
 
   return (
     <header
@@ -22,7 +22,21 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
+            {
+              authUser &&
+              <Link
+              to={"/dashboard"}
+              className={`
+              btn btn-sm gap-2 transition-colors
+              
+              `}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span className="hidden sm:inline">Dashboard</span>
+            </Link>
+            }
+            {
+              <Link
               to={"/settings"}
               className={`
               btn btn-sm gap-2 transition-colors
@@ -30,10 +44,11 @@ const Navbar = () => {
               `}
             >
               <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Settings</span>
+              <span className="hidden sm:inline">Setting</span>
             </Link>
+            }
 
-            {authUser && (
+            {/* {authUser && (
               <>
                 <Link to={"/profile"} className={`btn btn-sm gap-2`}>
                   <User className="size-5" />
@@ -45,7 +60,7 @@ const Navbar = () => {
                   <span className="hidden sm:inline">Logout</span>
                 </button>
               </>
-            )}
+            )} */}
             {!authUser && (
               <>
                 <Link to={"/login"} className={`btn btn-sm gap-2`}>
